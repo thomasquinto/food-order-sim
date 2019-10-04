@@ -36,19 +36,19 @@ public class Main {
      */
     static final String[] ARGUMENT_DEFAULTS = new String[] {
             "src/main/resources/Engineering_Challenge_-_Orders.json",
-            TimeUnit.MILLISECONDS.name(),
-            "13.25",
+            TimeUnit.SECONDS.name(),
+            "3.25",
             "2",
             "8",
-            "2",
+            "15",
             "1",
-            "2",
+            "15",
             "1",
-            "2",
+            "15",
             "1",
+            "20",
             "2",
-            "2",
-            "true"
+            "false"
     };
 
     /**
