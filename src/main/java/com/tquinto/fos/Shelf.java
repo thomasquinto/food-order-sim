@@ -8,12 +8,37 @@ import java.util.*;
 public interface Shelf extends Cloneable {
 
     /**
+     * This exception type is thrown if an order is added of some other type not included in
+     * <code>getAcceptedTypes()</code>.
+     */
+    class InvalidOrderTypeException extends RuntimeException {
+        public InvalidOrderTypeException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
+    /**
      * Type of shelf.
      *
      * For "temperature" shelves, orders have the same "temp" value as the shelf's type.
+     *
      * @return String value of shelf type (i.e. "hot", "cold", "frozen", "overflow")
      */
     String getType();
+
+    /**
+     * Returns string array of the types of orders this shelf accepts.
+     *
+     * @return String array of accepted order types.
+     */
+    Set<String> getAcceptedTypes();
+
+    /**
+     * Sets the accepted order types for this shelf. If an order is added for any other type, then an
+     * <code>InvalidOrderTypeException</code> will be thrown.
+     * @param acceptedTypes
+     */
+    void setAcceptedTypes(Set<String> acceptedTypes);
 
     /**
      * Returns limit of number orders that can be added to this shelf.

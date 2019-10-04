@@ -7,10 +7,7 @@ import com.tquinto.fos.Shelf;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +26,7 @@ public class BasicOverflowStrategyTest {
         Shelf coldShelf = new BasicShelf("cold", 2, 1.0f);
         Shelf frozenShelf = new BasicShelf("frozen", 2, 1.0f);
         Shelf overflowShelf = new BasicShelf("overflow", 2, 2.0f);
+        overflowShelf.setAcceptedTypes(new HashSet<>(new ArrayList<>(Arrays.asList("hot", "cold", "frozen"))));
 
         List<Shelf> shelves = new ArrayList<>(Arrays.asList(hotShelf, coldShelf, frozenShelf));
 

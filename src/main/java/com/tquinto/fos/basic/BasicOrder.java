@@ -228,6 +228,8 @@ public class BasicOrder implements Order {
      */
     @Override
     public float getDecayValue(Date currentDate) {
+        checkForNotInitializedException();
+
         int orderAge = (int) (getTimeUnit().convert(currentDate.getTime(), TimeUnit.MILLISECONDS) -
                 getTimeUnit().convert(addedToShelfDate.getTime(), TimeUnit.MILLISECONDS));
 
@@ -243,6 +245,8 @@ public class BasicOrder implements Order {
      */
     @Override
     public float getNormalizedDecayValue(Date currentDate) {
+        checkForNotInitializedException();
+
         return getDecayValue(currentDate) / getShelfLife();
     }
 
@@ -255,6 +259,8 @@ public class BasicOrder implements Order {
      */
     @Override
     public float getDecayDuration(Date currentDate) {
+        checkForNotInitializedException();
+
         int orderAge = (int) (getTimeUnit().convert(currentDate.getTime(), TimeUnit.MILLISECONDS) -
                 getTimeUnit().convert(addedToShelfDate.getTime(), TimeUnit.MILLISECONDS));
 
@@ -309,6 +315,15 @@ public class BasicOrder implements Order {
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    /**
+     * Helper method that makes sure order was properly initialized with internal state to do necessary calculations.
+     */
+    private void checkForNotInitializedException() {
+        if (addedToShelfDate == null) {
+            throw new NotInitializedException("initialize() method must be invoked first");
+        }
     }
 
 }

@@ -15,13 +15,15 @@ public class BasicShelfTest {
         assertEquals(1, shelf.getLimit());
         assertFalse(shelf.isFull());
 
-        Order order1 = new BasicOrder();
+        BasicOrder order1 = new BasicOrder();
+        order1.setTemp("hot");
 
         assertTrue(shelf.addOrder(order1));
         assertTrue(shelf.isFull());
         assertTrue(shelf.containsOrder(order1));
 
-        Order order2 = new BasicOrder();
+        BasicOrder order2 = new BasicOrder();
+        order2.setTemp("hot");
 
         assertFalse(shelf.addOrder(order2));
         assertFalse(shelf.containsOrder(order2));
@@ -30,7 +32,8 @@ public class BasicShelfTest {
     @Test
     public void testRemoveOrder() {
         Shelf shelf  = new BasicShelf("hot", 1, 1.0f);
-        Order order1 = new BasicOrder();
+        BasicOrder order1 = new BasicOrder();
+        order1.setTemp("hot");
 
         assertTrue(shelf.addOrder(order1));
         assertTrue(shelf.removeOrder(order1));
@@ -42,8 +45,11 @@ public class BasicShelfTest {
     public void testClone() {
         Shelf shelf = new BasicShelf("hot", 2, 1.0f);
 
-        Order order1 = new BasicOrder();
-        Order order2 = new BasicOrder();
+        BasicOrder order1 = new BasicOrder();
+        BasicOrder order2 = new BasicOrder();
+
+        order1.setTemp("hot");
+        order2.setTemp("hot");
 
         shelf.addOrder(order1);
         shelf.addOrder(order2);

@@ -3,6 +3,7 @@ package com.tquinto.fos.basic;
 import com.tquinto.fos.Order;
 import com.tquinto.fos.Shelf;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
 public class BasicShelf implements Shelf {
 
     private String type;
+    private Set<String> acceptedTypes = new HashSet<>();
     private int limit;
     private float decayRateMultiplier;
 
@@ -29,6 +31,8 @@ public class BasicShelf implements Shelf {
         this.type = type;
         this.limit = limit;
         this.decayRateMultiplier = decayRateMultiplier;
+
+        acceptedTypes.add(type);
     }
 
     /**
@@ -40,6 +44,24 @@ public class BasicShelf implements Shelf {
     @Override
     public String getType() {
         return type;
+    }
+
+    /**
+     * Returns string array of the types of orders this shelf accepts.
+     *
+     * @return String array of accepted order types.
+     */
+    public Set<String> getAcceptedTypes() {
+        return acceptedTypes;
+    }
+
+    /**
+     * Sets the accepted order types for this shelf. If an order is added for any other type, then an
+     * <code>InvalidOrderTypeException</code> will be thrown.
+     * @param acceptedTypes
+     */
+    public void setAcceptedTypes(Set<String> acceptedTypes) {
+        this.acceptedTypes = acceptedTypes;
     }
 
     /**
@@ -80,6 +102,10 @@ public class BasicShelf implements Shelf {
      */
     @Override
     public boolean addOrder(Order order) {
+        if (!acceptedTypes.contains(order.getTemp())) {
+            throw new InvalidOrderTypeException(String.format("Invalid order type: %s", order.getTemp()));
+        }
+
         if (orders.size() < limit) {
             return orders.add(order);
         }

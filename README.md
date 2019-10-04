@@ -1,7 +1,7 @@
 # Food Order Simulator (food-order-sim)
 
-A simple java command-line that simulates a kitchen that receives an order, puts the order on a shelf, and dispatches
-a driver to pickup the order.
+A simple java command-line application that simulates a kitchen that receives orders, puts the orders on a shelf, and 
+dispatches drivers to pickup the orders. The order stream is asynchronously read from a JSON file.
 
 Kitchens have two types of shelves: temperature-specific shelves, such as "hot", "cold" or "frozen", which can only
 hold food orders at their designated temperature type, and the "overflow" shelf that can only be used when a
@@ -20,7 +20,8 @@ Overflow strategies provide the logic of what the kitchen should do in the cases
 2) an order arrives and its temperature-designated shelf AND overflow shelf is full
 3) an order is removed (either by driver pickup or when an order has fully decayed to waste)
 
-This program was created as a solution presented by the challenge described in [Software_Engineering_Challenge.pdf](doc/Software_Engineering_Challenge.pdf)
+This program was created as a solution presented by the challenge described in 
+[Software_Engineering_Challenge.pdf](doc/Software_Engineering_Challenge.pdf)
 
 ## Installation and Usage
 
@@ -64,7 +65,9 @@ All of the output of the simular is written to standard out, and an output file 
 called `food-order-sim.log`. This log is overwritten by the last program execution.
 
 The textual display output updates whenever an order is added or removed and shows the contents of all shelves. 
-It also shows a count of total orders received, picked up, decayed to waste and manually removed as waste.
+It also shows a count of total orders received, picked up, decayed to waste and manually removed as waste. To
+learn more detail about what each order output represents, please see 
+[com.tquinto.fos.OrderEvent](src/main/java/com/tquinto/fos/OrderEvent.java).
 
 To get a sense of orders coming in realtime, use the `SECONDS` time unit argument such that orders are sent in
 batches (controlled by the `average number of orders` argument) in second intervals. To speed up the simulator
@@ -79,7 +82,8 @@ Lastly, to see more data per order in the output, you can specify `true` for ver
 ## Implementation Notes
 
 This section essentially describes how orders are handled when moving to and from the overflow shelf. For more
-in-depth implementation details, please see the documentation and source code for [com.tquinto.fos.basic.BasicOverflowStrategy.java](src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
+in-depth implementation details, please see the documentation and source code for 
+[com.tquinto.fos.basic.BasicOverflowStrategy.java](src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
 
 The general strategy employed in this implementation is:
 
@@ -94,7 +98,8 @@ order additional time before expiring, in the hope it will get picked up by a de
 find the order that will expire the soonest and remove that order, since there's already a higher probability that
 the order won't be picked up in time to be delivered.
 
-The decay formula is abstracted at the level of individual orders, with a specific implementation described in the comments for [com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
+The decay formula is abstracted at the level of individual orders, with a specific implementation described in the 
+comments for [com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
 
 ## License
 

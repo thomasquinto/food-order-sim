@@ -11,6 +11,16 @@ import java.util.concurrent.TimeUnit;
 public interface Order extends Cloneable {
 
     /**
+     * Enforces that <code>initialize()</code> method must be invoked before accessing some functions that require
+     * initialized internal state to perform time-based decay calculations.
+     */
+    class NotInitializedException extends RuntimeException {
+        public NotInitializedException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
+    /**
      * A unique identifier for the order. No two distinct orders will have the same id.
      *
      * @return unique id of order

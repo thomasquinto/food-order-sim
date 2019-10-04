@@ -21,7 +21,7 @@ public class BasicDecayFormula implements DecayFormula {
      */
     @Override
     public float getDecayValue(int shelfLife, float decayRate, int orderAge) {
-        return shelfLife - (orderAge * (1 + decayRate));
+        return Math.max((shelfLife - (orderAge * (1 + decayRate))), 0f);
     }
 
     /**

@@ -12,8 +12,8 @@ import org.javatuples.Pair;
 import java.util.*;
 
 /**
- * Simple implementation for a kitchen that receives an order, puts the order on a shelf, and dispatches a driver to
- * pickup the order.
+ * Simple implementation for a kitchen that receives orders, puts the orders on a shelf, and dispatches a drivers to
+ * pickup the orders.
  *
  * Kitchens have two types of shelves: temperature-specific shelves, such as "hot", "cold" or "frozen", which can only
  * hold food orders at their designated temperature type, and the "overflow" shelf that can only be used when a

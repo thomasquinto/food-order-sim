@@ -4,6 +4,8 @@ import com.tquinto.fos.basic.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -157,6 +159,7 @@ public class Main {
         Shelf coldShelf = new BasicShelf("cold", coldShelfCapacity, coldShelfDecayRateMultiplier);
         Shelf frozenShelf = new BasicShelf("frozen", frozenShelfCapacity, frozenShelfDecayRateMultiplier);
         Shelf overflowShelf = new BasicShelf("overflow", overflowShelfCapacity, overflowShelfDecayRateMultiplier);
+        overflowShelf.setAcceptedTypes(new HashSet<>(new ArrayList<>(Arrays.asList("hot", "cold", "frozen"))));
 
         List<Shelf> temperatureShelves = new ArrayList<>();
         temperatureShelves.add(hotShelf);
