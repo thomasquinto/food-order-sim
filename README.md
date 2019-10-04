@@ -20,9 +20,11 @@ Overflow strategies provide the logic of what the kitchen should do in the cases
 2) an order arrives and its temperature-designated shelf AND overflow shelf is full
 3) an order is removed (either by driver pickup or when an order has fully decayed to waste)
 
+This program was created as a solution presented by the challenge described in [Software_Engineering_Challenge.pdf](doc/Software_Engineering_Challenge.pdf)
+
 ## Installation and Usage
 
-`food-order-sim` uses the [Gradle] (https://gradle.org) build tool to build, run tests and run the command-line application.
+`food-order-sim` uses the [Gradle](https://gradle.org) build tool to build, run tests and run the command-line application.
 You can use the gradle wrapper that comes bundled with the project.
 
 To build and run unit tests (this example uses MacOS command-line syntax):
@@ -78,7 +80,7 @@ Lastly, to see more data per order in the output, you can specify `true` for ver
 
 This section essentially describes how orders are handled when moving to and from the overflow shelf. For more
 in-depth implementation details, please see the documentation and source code for 
-[com.tquinto.fos.basic.BasicOverflowStrategy] (src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
+[com.tquinto.fos.basic.BasicOverflowStrategy.java](src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
 
 The general strategy employed in this implementation is:
 
@@ -94,7 +96,7 @@ find the order that will expire the soonest and remove that order, since there's
 the order won't be picked up in time to be delivered.
 
 The decay formula is abstracted, with a specific implementation described in the comments for
-[com.tquinto.fos.basic.BasicDecayFormula] (src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
+[com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
 
 ## License
 
