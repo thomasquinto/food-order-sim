@@ -20,6 +20,6 @@ Overflow strategies provide the logic of what the kitchen should do in the cases
 2) an order arrives and its temperature-designated shelf AND overflow shelf is full
 3) an order is removed (either by driver pickup or when an order has fully decayed to waste)
 
-This application was built to satisfy the problem presented in [a relative link] doc/Software_Engineering_Challenge.pdf.
+This application was built to satisfy the problem presented in [a relative link] (doc/Software_Engineering_Challenge.pdf)
 
 
