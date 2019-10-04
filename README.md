@@ -103,6 +103,8 @@ MIT License
 ## About Me
 
 Thomas Quinto
+
 `thomasq@gmail.com`
+
 [My Linked-In Profile](https://linkedin.com/pub/thomas-quinto/0/b/4a1)
 
