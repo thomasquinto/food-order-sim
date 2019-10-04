@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Main entry-point to running the Food Order Simulator via command-line.
+ */
 public class Main {
 
     /**
