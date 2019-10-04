@@ -79,8 +79,7 @@ Lastly, to see more data per order in the output, you can specify `true` for ver
 ## Implementation Notes
 
 This section essentially describes how orders are handled when moving to and from the overflow shelf. For more
-in-depth implementation details, please see the documentation and source code for 
-[com.tquinto.fos.basic.BasicOverflowStrategy.java](src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
+in-depth implementation details, please see the documentation and source code for [com.tquinto.fos.basic.BasicOverflowStrategy.java](src/main/java/com/tquinto/fos/basic/BasicOverflowStrategy.java)
 
 The general strategy employed in this implementation is:
 
@@ -95,8 +94,7 @@ order additional time before expiring, in the hope it will get picked up by a de
 find the order that will expire the soonest and remove that order, since there's already a higher probability that
 the order won't be picked up in time to be delivered.
 
-The decay formula is abstracted, with a specific implementation described in the comments for
-[com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
+The decay formula is abstracted, with a specific implementation described in the comments for [com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
 
 ## License
 
