@@ -94,7 +94,7 @@ order additional time before expiring, in the hope it will get picked up by a de
 find the order that will expire the soonest and remove that order, since there's already a higher probability that
 the order won't be picked up in time to be delivered.
 
-The decay formula is abstracted, with a specific implementation described in the comments for [com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
+The decay formula is abstracted at the level of individual orders, with a specific implementation described in the comments for [com.tquinto.fos.basic.BasicDecayFormula.java](src/main/java/com/tquinto/fos/basic/BasicDecayFormula.java). 
 
 ## License
 
