@@ -1,0 +1,13 @@
+# generated files
+build/
+out/
+
+# log files
+*.log
+
+# gradle
+.gradle
+
+# idea
+.idea
+
