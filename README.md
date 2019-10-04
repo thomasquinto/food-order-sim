@@ -77,7 +77,7 @@ Lastly, to see more data per order in the output, you can specify `true` for ver
 ## Implementation Notes
 
 This section essentially describes how orders are handled when moving to and from the overflow shelf. For more
-in-depth implementation details, please see the source code for `com.tquinto.fos.basic.BasicOverflowStrategy`.
+in-depth implementation details, please see the documentation and source code for `com.tquinto.fos.basic.BasicOverflowStrategy`.
 
 The general strategy employed in this implementation is:
 
