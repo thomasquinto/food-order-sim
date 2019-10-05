@@ -270,7 +270,7 @@ public class BasicKitchen implements Kitchen {
         if (getShelf(wasteOrder.getTemp()).removeOrder(wasteOrder)) {
             // order was removed from a "temperature" shelf
             Shelf removedFromShelf = getShelf(wasteOrder.getTemp());
-            orderWasted(date, wasteOrder, removedFromShelf);
+            orderComplete(date, wasteOrder, removedFromShelf, OrderEvent.Type.REMOVED_WASTE);
 
             if(replacementOrder == incomingOrder) {
                 // incoming order takes the removed order's place
@@ -303,7 +303,7 @@ public class BasicKitchen implements Kitchen {
             }
         } else if (getOverflowShelf().removeOrder(wasteOrder)) {
             // order was removed from overflow shelf
-            orderWasted(date, wasteOrder, getOverflowShelf());
+            orderComplete(date, wasteOrder, getOverflowShelf(), OrderEvent.Type.REMOVED_WASTE);
 
             if(replacementOrder == incomingOrder) {
                 // incoming order takes removed overflow order's place
@@ -337,7 +337,7 @@ public class BasicKitchen implements Kitchen {
             }
         } else {
             // must be incoming order since it wasn't on any shelf, so immediately throw out as waste
-            orderWasted(date, wasteOrder, null);
+            orderComplete(date, wasteOrder, null, OrderEvent.Type.REMOVED_WASTE);
         }
     }
 
@@ -351,42 +351,32 @@ public class BasicKitchen implements Kitchen {
         Date date = new Date();
 
         if (getShelf(order.getTemp()).removeOrder(order)) {
-            orderWasted(date, order, getShelf(order.getTemp()));
+            orderComplete(date, order, getShelf(order.getTemp()), OrderEvent.Type.DECAYED_WASTE);
             // replace open spot with an order from overflow shelf
             replaceWithOverflowItem(order, getShelf(order.getTemp()), date);
         } else if (getOverflowShelf().removeOrder(order)) {
-            orderWasted(date, order, getOverflowShelf());
+            orderComplete(date, order, getOverflowShelf(), OrderEvent.Type.DECAYED_WASTE);
         }
 
         checkForCompletion();
     }
 
     /**
-     * Called immediately after an order has been thrown out as waste because it's decay value has reached zero.
+     * Final event occurring for an order which is one of the following:
+     * 1) order was picked up by a driver and delivered
+     * 2) order fully decayed to waste (decay value reached zero)
+     * 3) order was manually removed as waste to make room for new orders
      *
-     * @param date date at which order was removed as waste
-     * @param order order that has fully decayed to waste
+     * @param date date at which order was completed
+     * @param order order that has completed
      * @param shelf shelf the order was removed from
+     * @param orderEventType order event type
      */
-    private void orderWasted(Date date, Order order, Shelf shelf) {
+    private void orderComplete(Date date, Order order, Shelf shelf, OrderEvent.Type orderEventType) {
         cancelSubscriptions(order);
         String shelfType = shelf != null ? shelf.getType() : null;
-        sendOrderEvent(order, OrderEvent.Type.REMOVED_WASTE, shelfType, date);
+        sendOrderEvent(order, orderEventType, shelfType, date);
     }
-
-    /**
-     * Called immediately after a driver has picked up an order.
-     *
-     * @param date date at which order was picked up
-     * @param order order that was picked up by driver
-     * @param shelf shelf from which the order was picked up from
-     */
-    private void orderPickedUp(Date date, Order order, Shelf shelf) {
-        cancelSubscriptions(order);
-        String shelfType = shelf != null ? shelf.getType() : null;
-        sendOrderEvent(order, OrderEvent.Type.PICKED_UP, shelfType, date);
-    }
-
 
     /**
      * Dispatches a driver to pickup a designated order.
@@ -428,12 +418,12 @@ public class BasicKitchen implements Kitchen {
                 // NOTE: this can only happen since order decay delay duration is rounded up to nearest integer time
                 // unit, meaning a race condition could arise if the driver picks up within the rounding delta
                 orderRemoved = true;
-                orderWasted(date, order, shelf);
+                orderComplete(date, order, shelf, OrderEvent.Type.DECAYED_WASTE);
             } else if (shelf.removeOrder(order)) {
                 // order was removed from its current shelf
                 orderRemoved = true;
                 // mark as picked up
-                orderPickedUp(date, order, shelf);
+                orderComplete(date, order, shelf, OrderEvent.Type.PICKED_UP);
             }
 
             if (orderRemoved && shelf != getOverflowShelf()) {

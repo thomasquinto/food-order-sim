@@ -264,7 +264,7 @@ public class BasicOrder implements Order {
         int orderAge = (int) (getTimeUnit().convert(currentDate.getTime(), TimeUnit.MILLISECONDS) -
                 getTimeUnit().convert(addedToShelfDate.getTime(), TimeUnit.MILLISECONDS));
 
-        return decayFormula.getDecayDuration(adjustedShelfLife, currentDecayRate) - orderAge;
+        return Math.max(decayFormula.getDecayDuration(adjustedShelfLife, currentDecayRate) - orderAge, 0f);
     }
 
     /**
