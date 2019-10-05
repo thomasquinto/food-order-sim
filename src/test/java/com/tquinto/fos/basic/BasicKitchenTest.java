@@ -8,7 +8,6 @@ import io.reactivex.subjects.PublishSubject;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -140,7 +139,7 @@ public class BasicKitchenTest {
      * Tests multiple orders streaming to a kitchen.
      */
     @Test
-    public void testAddMultipleOrders() {
+    public void testProcessMultipleOrders() {
         final Kitchen kitchen = buildKitchen(5, new BasicOverflowStrategy());
         final Order order = getTestOrder();
         final PublishSubject<Order> subject = PublishSubject.create();
