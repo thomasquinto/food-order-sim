@@ -149,22 +149,26 @@ public class BasicKitchen implements Kitchen {
      * @param order order that was just placed from the order source
      */
     private synchronized void processOrder(Order order) {
-        Date date = new Date();
-        order.initialize(date);
+        try {
+            Date date = new Date();
+            order.initialize(date);
 
-        dispatchDriver(order);
+            dispatchDriver(order);
 
-        if (getShelf(order.getTemp()).addOrder(order)) {
-            // successfully added to shelf of appropriate temperature (hot, cold, or frozen)
-            orderAddedToShelf(date, order, getShelf(order.getTemp()));
-        } else if (!getOverflowShelf().isFull()) {
-            // designated temperature shelf is full, so ask the overflow strategy which order from the shelf (or the
-            // incoming order) should be placed on the overflow shelf where there is still room
-            shiftOrdersOnTempShelfFull(date, order, overflowStrategy.onTempShelfFull(this, order, date));
-        } else {
-            // designated temperature shelf is full AND overflow shelf is full
-            Pair<Order, Order> ordersResult = overflowStrategy.onOverflowShelfFull(this, order, date);
-            shiftOrdersOnOverflowShelfFull(date, order, ordersResult.getValue0(), ordersResult.getValue1());
+            if (getShelf(order.getTemp()).addOrder(order)) {
+                // successfully added to shelf of appropriate temperature (hot, cold, or frozen)
+                orderAddedToShelf(date, order, getShelf(order.getTemp()));
+            } else if (!getOverflowShelf().isFull()) {
+                // designated temperature shelf is full, so ask the overflow strategy which order from the shelf (or the
+                // incoming order) should be placed on the overflow shelf where there is still room
+                shiftOrdersOnTempShelfFull(date, order, overflowStrategy.onTempShelfFull(this, order, date));
+            } else {
+                // designated temperature shelf is full AND overflow shelf is full
+                Pair<Order, Order> ordersResult = overflowStrategy.onOverflowShelfFull(this, order, date);
+                shiftOrdersOnOverflowShelfFull(date, order, ordersResult.getValue0(), ordersResult.getValue1());
+            }
+        } catch(Exception ex) {
+            orderEventSubject.onError(ex);
         }
     }
 
@@ -282,7 +286,7 @@ public class BasicKitchen implements Kitchen {
                         orderAddedToShelf(date, incomingOrder, getOverflowShelf());
                     } else {
                         throw new OverflowStrategy.InvalidProcedureException(
-                                "failed to add incoming order from overflow shelf");
+                                "failed to add incoming order to overflow shelf");
                     }
                 } else {
                     throw new OverflowStrategy.InvalidProcedureException(

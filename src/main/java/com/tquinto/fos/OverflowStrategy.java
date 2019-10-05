@@ -11,7 +11,7 @@ import java.util.Date;
 public interface OverflowStrategy {
 
     /**
-     * If an implementation implementing these callbacks uses illegal arguments (e.g. order candidates), this type of
+     * If an implementation implementing these callbacks return illegal results (e.g. order candidates), this type of
      * exception will be thrown.
      */
     class InvalidProcedureException extends RuntimeException {
