@@ -33,14 +33,22 @@ import java.util.*;
  */
 public class BasicKitchen implements Kitchen {
 
+    // overflow strategy for logic of adding to/from overflow shelf
     private OverflowStrategy overflowStrategy;
+    // dispatcher for drivers to pickup orders
     private Dispatcher dispatcher;
+    // temperature shelves
     private Map<String, Shelf> shelves;
+    // overflow shelf
     private Shelf overflowShelf;
+    // emits events from processed orders (e.g. for display output)
     private Subject<OrderEvent> orderEventSubject;
+    // true when all orders processed and all orders have 1) been picked up or 2) fully decayed
     private boolean allOrdersProcessed;
 
+    // subscriptions for scheduling decay countdowns of orders
     private final Map<Order, Disposable> decayDisposables;
+    // subscriptions for scheduling drivers to pick up orders
     private final Map<Order, Disposable> driverDisposables;
 
     /**

@@ -21,6 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class BasicKitchenTest {
 
+    /**
+     * Builds a populated kitchen object for test purposes.
+     * @param shelfCapacity size for all shelves in kitchen
+     * @param dispatchDriverImmediately set to true for no wait for driver to pickup order
+     * @return test kitchen instance
+     */
     private Kitchen buildKitchen(int shelfCapacity, boolean dispatchDriverImmediately) {
         final Shelf hotShelf = new BasicShelf("hot", shelfCapacity, 1);
         final Shelf coldShelf = new BasicShelf("cold", shelfCapacity, 1);
@@ -38,7 +44,11 @@ public class BasicKitchenTest {
                 overflowShelf);
     }
 
-    // generates test order
+    /**
+     * Generates order for testing purposes.
+     *
+     * @return order for testing purposes
+     */
     public Order getTestOrder() {
         final BasicOrder order = new BasicOrder();
         order.setName("Banana Split");

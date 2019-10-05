@@ -26,7 +26,8 @@ This program was created as a solution presented by the challenge described in
 ## Installation and Usage
 
 `food-order-sim` uses the [Gradle](https://gradle.org) build tool to build, run tests and run the command-line application.
-You can use the gradle wrapper that comes bundled with the project.
+You can use the gradle wrapper that comes bundled with the project and invoke it from the command-line in the root
+directory of this project.
 
 To build and run unit tests (this example uses MacOS command-line syntax):
 
@@ -67,7 +68,7 @@ called `food-order-sim.log`. This log is overwritten by the last program executi
 The textual display output updates whenever an order is added or removed and shows the contents of all shelves. 
 It also shows a count of total orders received, picked up, decayed to waste and manually removed as waste. To
 learn more detail about what each order output represents, please see 
-[com.tquinto.fos.OrderEvent](src/main/java/com/tquinto/fos/OrderEvent.java).
+[com.tquinto.fos.OrderEvent.java](src/main/java/com/tquinto/fos/OrderEvent.java).
 
 To get a sense of orders coming in realtime, use the `SECONDS` time unit argument such that orders are sent in
 batches (controlled by the `average number of orders` argument) in second intervals. To speed up the simulator
