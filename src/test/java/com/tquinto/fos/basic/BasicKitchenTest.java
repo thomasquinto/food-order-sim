@@ -1,6 +1,7 @@
 package com.tquinto.fos.basic;
 
 import com.tquinto.fos.*;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
@@ -176,6 +177,7 @@ public class BasicKitchenTest {
 
         disposable.dispose();
     }
+    */
 
     @Test
     public void testAddOrderToShelf_BROKEN1() {
@@ -183,7 +185,6 @@ public class BasicKitchenTest {
         final Order order = getTestOrder();
         final PublishSubject<Order> subject = PublishSubject.create();
         OrderSource orderSource = () -> subject.hide();
-
 
         TestObserver<OrderEvent> testObserver = new TestObserver<>();
         kitchen.processOrders(orderSource).subscribe(testObserver);
@@ -217,5 +218,5 @@ public class BasicKitchenTest {
         testObserver.assertValueCount(1);
         testObserver.dispose();
     }
-     */
+
 }

@@ -17,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class BasicOverflowStrategyTest {
 
+    /**
+     * Initialize an order and update decay rate to that decay methods may be invoked.
+     */
     private Order initOrder(BasicOrder order, Date date) {
         order.initialize(date);
         order.setTimeUnit(TimeUnit.SECONDS);

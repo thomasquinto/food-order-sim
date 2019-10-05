@@ -13,6 +13,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class BasicOrderSourceTest {
 
+    /**
+     * Generate a test object for testing purposes.
+     */
     private Order getTestOrder() {
         BasicOrder order = new BasicOrder();
         order.setName("Banana Split");

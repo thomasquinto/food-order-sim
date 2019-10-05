@@ -87,7 +87,24 @@ public class BasicOrderTest {
     }
 
     /**
-     * Tests decay value, normalized decay value and decay duration of an order.
+     * Test not-initialized exception.
+     */
+    @Test
+    public void testNotInitializedException() {
+        BasicOrder order = new BasicOrder();
+        order.setShelfLife(300);
+        order.setDecayRate(.45f);
+        order.setTimeUnit(TimeUnit.SECONDS);
+
+        // initialized intentionally not called
+
+        assertThrows(Order.NotInitializedException.class, () -> {
+            order.getDecayDuration(new Date());
+        });
+    }
+
+    /**
+     * Tests decay value, normalized decay value and decay duration of an order over time.
      */
     @Test
     public void testDecay() {
@@ -143,5 +160,28 @@ public class BasicOrderTest {
         Date date6 = new Date(date1.getTime() + TimeUnit.MILLISECONDS.convert(207, order.getTimeUnit()));
         order.updateDecayRate(date6, order.getDecayRate());
         assertTrue(order.getDecayValue(date6) <= 0);
+    }
+
+    /**
+     * Test temporarily changing decay rate and back again.
+     */
+    @Test
+    public void testTemporaryDecayChanges() {
+        BasicOrder order = new BasicOrder();
+        order.setShelfLife(300);
+        order.setDecayRate(.45f);
+        order.setTimeUnit(TimeUnit.SECONDS);
+
+        Date date = new Date();
+        order.initialize(date);
+
+        assertEquals(order.getDecayDuration(date), 206.89655f);
+
+        order.updateDecayRate(date, order.getDecayRate() * 2);
+        assertEquals(order.getCurrentDecayRate(), order.getDecayRate() * 2);
+
+        order.updateDecayRate(date, order.getDecayRate());
+        assertEquals(order.getCurrentDecayRate(), order.getDecayRate());
+        assertEquals(order.getDecayDuration(date), 206.89655f);
     }
 }
