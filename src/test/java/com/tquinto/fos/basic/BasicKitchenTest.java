@@ -1,19 +1,17 @@
 package com.tquinto.fos.basic;
 
 import com.tquinto.fos.*;
-import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,24 +21,33 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BasicKitchenTest {
 
     /**
+     * Initialize an order and update decay rate to that decay methods may be invoked.
+     */
+    private Order initOrder(BasicOrder order, Date date) {
+        order.initialize(date);
+        order.setTimeUnit(TimeUnit.SECONDS);
+        order.updateDecayRate(date, order.getDecayRate());
+        return order;
+    }
+
+    /**
      * Builds a populated kitchen object for test purposes.
      * @param shelfCapacity size for all shelves in kitchen
-     * @param dispatchDriverImmediately set to true for no wait for driver to pickup order
+     * @param overflowStrategy overflow strategy
      * @return test kitchen instance
      */
-    private Kitchen buildKitchen(int shelfCapacity, boolean dispatchDriverImmediately) {
+    private Kitchen buildKitchen(int shelfCapacity, OverflowStrategy overflowStrategy) {
         final Shelf hotShelf = new BasicShelf("hot", shelfCapacity, 1);
         final Shelf coldShelf = new BasicShelf("cold", shelfCapacity, 1);
         final Shelf frozenShelf = new BasicShelf("frozen", shelfCapacity, 1);
         List<Shelf> shelves = new ArrayList<>(Arrays.asList(hotShelf, coldShelf, frozenShelf));
 
         final Shelf overflowShelf = new BasicShelf("overflow", shelfCapacity, 2);
-
-        int driverDuration = dispatchDriverImmediately ? 0 : Integer.MAX_VALUE;
+        overflowShelf.setAcceptedTypes(new HashSet<>(new ArrayList<>(Arrays.asList("hot", "cold", "frozen"))));
 
         return new BasicKitchen(
                 new BasicOverflowStrategy(),
-                new BasicDispatcher(TimeUnit.SECONDS, driverDuration, driverDuration),
+                new BasicDispatcher(TimeUnit.SECONDS, 10, 10),
                 shelves,
                 overflowShelf);
     }
@@ -65,7 +72,7 @@ public class BasicKitchenTest {
      */
     @Test
     public void testAddOrderToShelf() {
-        final Kitchen kitchen = buildKitchen(1, false);
+        final Kitchen kitchen = buildKitchen(1, new BasicOverflowStrategy());
         final Order order = getTestOrder();
         final PublishSubject<Order> subject = PublishSubject.create();
         final OrderSource orderSource = () -> subject.hide();
@@ -129,59 +136,12 @@ public class BasicKitchenTest {
         assertFalse(isError.get());
     }
 
-    /*
+    /**
+     * Tests multiple orders streaming to a kitchen.
+     */
     @Test
-    public void testOrderPickedUp() {
-        final Kitchen kitchen = buildKitchen(1, true);
-        final Order order = getTestOrder();
-        final PublishSubject<Order> subject = PublishSubject.create();
-        final OrderSource orderSource = () -> subject.hide();
-        final AtomicInteger orderEventCount = new AtomicInteger(0);
-
-        Disposable disposable = kitchen.processOrders(orderSource)
-                .subscribe(orderEvent -> {
-                        System.out.println("onNext: " +
-                                new BasicOrderEventDisplay(null, false)
-                                        .formatOrderEvent(orderEvent));
-                        // verify event corresponds with placed order
-                        assertEquals(orderEvent.getOrder(), order);
-
-                        if (orderEventCount.get() == 0) {
-                            // first event is order added to shelf
-                            orderEventCount.set(orderEventCount.get() + 1);
-                            // verify event corresponds with placed order
-                            assertEquals(orderEvent.getOrder(), order);
-                            // verify event type
-                            assertEquals(orderEvent.getType(), OrderEvent.Type.ADDED_TO_SHELF);
-                            // verify order was placed on correct shelf
-                            assertTrue(kitchen.getShelf(order.getTemp()).containsOrder(order));
-                        } else if (orderEventCount.get() == 1) {
-                            // second event is order picked up by driver
-                            orderEventCount.set(orderEventCount.get() + 1);
-                            // verify event corresponds with placed order
-                            assertEquals(orderEvent.getOrder(), order);
-                            // verify event type
-                            assertEquals(orderEvent.getType(), OrderEvent.Type.PICKED_UP);
-                            // verify order was removed from shelf
-                            assertFalse(kitchen.getShelf(order.getTemp()).containsOrder(order));
-                        }
-                    });
-
-        // place order
-        subject.onNext(order);
-
-        assertEquals(2, orderEventCount.get());
-
-        // complete order stream
-        subject.onComplete();
-
-        disposable.dispose();
-    }
-    */
-
-    @Test
-    public void testAddOrderToShelf_BROKEN1() {
-        final Kitchen kitchen = buildKitchen(5, false);
+    public void testAddMultipleOrders() {
+        final Kitchen kitchen = buildKitchen(5, new BasicOverflowStrategy());
         final Order order = getTestOrder();
         final PublishSubject<Order> subject = PublishSubject.create();
         OrderSource orderSource = () -> subject.hide();
@@ -189,33 +149,101 @@ public class BasicKitchenTest {
         TestObserver<OrderEvent> testObserver = new TestObserver<>();
         kitchen.processOrders(orderSource).subscribe(testObserver);
 
-        System.out.println("GOT HERE 1");
-
         subject.onNext(order);
         testObserver.assertValueCount(1);
 
-        System.out.println("GOT HERE 2");
+        subject.onNext(initOrder(new BasicOrder("Pressed Juice", "cold", 250, .2f),
+                new Date()));
+        subject.onNext(initOrder(new BasicOrder("Cheese Pizza", "hot", 200, .76f),
+                new Date()));
 
-        testObserver.awaitCount(2);
+        testObserver.assertValueCount(3);
 
-        // BROKEN:
-        subject.onComplete();
-        testObserver.assertComplete();
+        testObserver.dispose();
     }
 
+    /**
+     * Builds a kitchen with orders on its shelves for testing.
+     */
+    private Kitchen buildKitchen(OverflowStrategy overflowStrategy, Date date) {
+        Shelf hotShelf = new BasicShelf("hot", 2, 1.0f);
+        Shelf coldShelf = new BasicShelf("cold", 2, 1.0f);
+        Shelf frozenShelf = new BasicShelf("frozen", 2, 1.0f);
+        Shelf overflowShelf = new BasicShelf("overflow", 2, 2.0f);
+        overflowShelf.setAcceptedTypes(new HashSet<>(new ArrayList<>(Arrays.asList("hot", "cold", "frozen"))));
+
+        List<Shelf> shelves = new ArrayList<>(Arrays.asList(hotShelf, coldShelf, frozenShelf));
+
+        hotShelf.addOrder(
+                initOrder(new BasicOrder("Cheese Pizza", "hot", 200, .76f), date));
+        hotShelf.addOrder(
+                initOrder(new BasicOrder("Onion Rings", "hot", 201, .7f), date));
+
+        coldShelf.addOrder(
+                initOrder(new BasicOrder("Pressed Juice", "cold", 250, .2f), date));
+        coldShelf.addOrder(
+                initOrder(new BasicOrder("Kombucha", "cold", 246, .19f), date));
+
+        frozenShelf.addOrder(
+                initOrder(new BasicOrder("Popsicle", "frozen", 345, .75f), date));
+        frozenShelf.addOrder(
+                initOrder(new BasicOrder("McFlury", "frozen", 372, .45f), date));
+
+        overflowShelf.addOrder(
+                initOrder(new BasicOrder("Apples", "cold", 244, .23f * 2), date));
+        overflowShelf.addOrder(
+                initOrder(new BasicOrder("Poppers", "hot", 204, .78f * 2), date));
+
+        Kitchen kitchen = new BasicKitchen(overflowStrategy,
+                new BasicDispatcher(TimeUnit.SECONDS, 0, 10),
+                shelves,
+                overflowShelf);
+
+        return kitchen;
+    }
+
+    /**
+     * Test that the OverflowStrategy.InvalidProcedureException exception gets thrown in an error scenario
+     */
     @Test
-    public void testAddOrderToShelf_BROKEN2() {
-        Kitchen kitchen = buildKitchen(5, false);
+    public void testStrategyInvalidProcedureException() {
 
+        // overflow strategy intentionally returns bogus orders
+        OverflowStrategy overflowStrategy = new OverflowStrategy() {
+            @Override
+            public Order onTempShelfFull(Kitchen kitchen, Order incomingOrder, Date date) {
+                return null;
+            }
+
+            @Override
+            public Pair<Order, Order> onOverflowShelfFull(Kitchen kitchen, Order incomingOrder, Date date) {
+                Set<Order> orders = kitchen.getShelf("cold").getOrders();
+                Order removalCandidate = null;
+                for (Order order : orders) {
+                    removalCandidate = order;
+                    break;
+                }
+                return Pair.with(removalCandidate, null);
+            }
+
+            @Override
+            public Order onOrderRemoved(Kitchen kitchen, Order removedOrder, Date date) {
+                return null;
+            }
+        };
+
+        final Kitchen kitchen = buildKitchen(overflowStrategy, new Date());
         final Order order = getTestOrder();
+        final PublishSubject<Order> subject = PublishSubject.create();
+        OrderSource orderSource = () -> subject.hide();
 
-        OrderSource orderSource = () -> Observable.just((Order) order);
+        TestObserver<OrderEvent> testObserver = new TestObserver<>();
+        kitchen.processOrders(orderSource).subscribe(testObserver);
 
-        TestObserver<OrderEvent> testObserver = kitchen.processOrders(orderSource).test();
+        subject.onNext(order);
 
-        testObserver.awaitCount(1);
+        testObserver.assertError(OverflowStrategy.InvalidProcedureException.class);
 
-        testObserver.assertValueCount(1);
         testObserver.dispose();
     }
 

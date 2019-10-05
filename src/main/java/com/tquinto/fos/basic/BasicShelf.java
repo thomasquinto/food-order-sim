@@ -3,7 +3,6 @@ package com.tquinto.fos.basic;
 import com.tquinto.fos.Order;
 import com.tquinto.fos.Shelf;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

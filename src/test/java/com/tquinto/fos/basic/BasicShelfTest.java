@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class BasicShelfTest {
 
-
     /**
      * Tests exception being thrown for trying to add order of wrong type/temp.
      */

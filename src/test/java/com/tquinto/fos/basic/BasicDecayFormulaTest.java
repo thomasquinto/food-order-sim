@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BasicDecayFormulaTest {
 
     /**
-     * Test actual values for decay formula.
+     * Test actual calculation of decay value.
      */
     @Test
     public void testDecayValue() {
@@ -21,12 +21,12 @@ public class BasicDecayFormulaTest {
     }
 
     /**
-     * Test actual values for normalized decay formula.
+     * Test actual calculation of decay duration.
      */
     @Test
-    public void testNormalizedDecayValue() {
+    public void testDecayDuration() {
         DecayFormula formula = new BasicDecayFormula();
-        float value = formula.getDecayValue(20, .63f, 1);
-        assertEquals(value, (20 - 1 - .63f) / 20);
+        float value = formula.getDecayDuration(20, .63f);
+        assertEquals(value, 20 / (1 + .63f));
     }
 }

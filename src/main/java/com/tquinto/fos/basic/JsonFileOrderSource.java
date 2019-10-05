@@ -2,7 +2,6 @@ package com.tquinto.fos.basic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import com.tquinto.fos.Order;
 import io.reactivex.Observable;

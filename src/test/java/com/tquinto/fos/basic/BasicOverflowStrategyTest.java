@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BasicOverflowStrategyTest {
 
     /**
-     * Initialize an order and update decay rate to that decay methods may be invoked.
+     * Initialize an order and update decay rate so that decay methods may be invoked.
      */
     private Order initOrder(BasicOrder order, Date date) {
         order.initialize(date);
@@ -65,6 +65,23 @@ public class BasicOverflowStrategyTest {
                 overflowShelf);
 
         return kitchen;
+    }
+
+    /**
+     * Tests correct result of <code>onTempShelfFull</code>.
+     */
+    @Test
+    public void testOnTempShelfFull() {
+        OverflowStrategy overflowStrategy = new BasicOverflowStrategy();
+        Date date = new Date();
+        Kitchen kitchen = buildKitchen(overflowStrategy, date);
+
+        Order incomingOrder = initOrder(
+                new BasicOrder("Banana Split", "frozen", 20, .63f), date);
+
+        Order order = overflowStrategy.onTempShelfFull(kitchen, incomingOrder, date);
+        // should be order with longest decay duration
+        assertEquals(order.getName(), "McFlury");
     }
 
     /**
@@ -126,6 +143,7 @@ public class BasicOverflowStrategyTest {
                 ((BasicOrder) order).setShelfLife(1);
                 order.updateDecayRate(new Date(), 10.0f);
                 tempOrder = order;
+                break;
             }
         }
         Pair<Order,Order> orderPair = overflowStrategy.onOverflowShelfFull(kitchen, tempOrder, date);
@@ -133,5 +151,28 @@ public class BasicOverflowStrategyTest {
         // should return this order as the "removal candidate"
         assertEquals(tempOrder, orderPair.getValue0());
         assertNull(orderPair.getValue1());
+    }
+
+    /**
+     * Tests correct result of <code>onOrderRemoved</code>.
+     */
+    @Test
+    public void testOnOrderRemoved() {
+        OverflowStrategy overflowStrategy = new BasicOverflowStrategy();
+        Date date = new Date();
+        Kitchen kitchen = buildKitchen(overflowStrategy, date);
+
+        Order removedOrder = null;
+        for (Order order : kitchen.getShelf("cold").getOrders()) {
+            if (order.getName().equals("Kombucha")) {
+                assertTrue(kitchen.getShelf("cold").removeOrder(order));
+                removedOrder = order;
+                break;
+            }
+        }
+
+        Order order = overflowStrategy.onOrderRemoved(kitchen, removedOrder, date);
+        // should select the "cold" order from the overflow shelf
+        assertEquals(order.getName(), "Apples");
     }
 }
