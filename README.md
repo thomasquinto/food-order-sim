@@ -36,7 +36,7 @@ To run the command-line application (with default arguments):
 
 `./gradlew run`
 
-To run the command-line application with command-line arguments:
+To run the command-line application with custom arguments:
 
 `./gradlew run --args="src/main/resources/Engineering_Challenge_-_Orders.json SECONDS 3.25 2 8 15 1 15 1 15 1 20 2 false"`
 
@@ -59,7 +59,7 @@ Food Order Simulator arguments:
 11) frozen shelf decay rate multiplier (float): 1
 12) overflow shelf order capacity (integer): 20
 13) overflow shelf decay rate multiplier (float): 2
-14) verbose mode for display out (boolean): false
+14) verbose mode for output (boolean): false
 
 All of the output of the simular is written to standard out, and an output file in the project root directory
 called `food-order-sim.log`. This log is overwritten by the last program execution.

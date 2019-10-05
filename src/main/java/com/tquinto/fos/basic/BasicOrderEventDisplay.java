@@ -151,11 +151,11 @@ public class BasicOrderEventDisplay implements OrderEventDisplay {
          * @return formatted string of an order event
          */
         public String formatOrderEvent(OrderEvent orderEvent, boolean isVerboseMode) {
-            return String.format("\n\n%s\n%s\n%s%s%s\n%s",
-                    orderEvent.getDate(),
-                    formatOrder(orderEvent.getOrder(), orderEvent.getDate(), isVerboseMode),
+            return String.format("\n\n%s%s\n%s\n%s%s\n%s",
                     orderEvent.getType(),
                     formatShelfType(orderEvent.getShelfType()),
+                    formatOrder(orderEvent.getOrder(), orderEvent.getDate(), isVerboseMode),
+                    orderEvent.getDate(),
                     formatShelves(orderEvent.getShelves(), orderEvent.getDate(), isVerboseMode),
                     formatCounts());
         }
@@ -167,9 +167,6 @@ public class BasicOrderEventDisplay implements OrderEventDisplay {
          * @return formatted string of a shelf type
          */
         private String formatShelfType(String shelfType) {
-            if (shelfType == null) {
-                return "";
-            }
             return String.format(" - %s shelf", shelfType);
         }
 

@@ -204,6 +204,9 @@ public class BasicKitchen implements Kitchen {
         if (incomingOrder == orderToMoveToOverflow) {
             if (getOverflowShelf().addOrder(incomingOrder)) {
                 orderAddedToShelf(date, orderToMoveToOverflow, getOverflowShelf());
+            } else {
+                throw new OverflowStrategy.InvalidProcedureException(
+                        "failed to add incoming order to overflow shelf");
             }
         } else {
             // if order is on a designated temperature shelf (e.g. not the incoming order), remove it first
@@ -215,8 +218,17 @@ public class BasicKitchen implements Kitchen {
                     // now add incoming order as replacement for order added to overflow shelf
                     if (getShelf(orderToMoveToOverflow.getTemp()).addOrder(incomingOrder)) {
                         orderAddedToShelf(date, incomingOrder, getShelf(orderToMoveToOverflow.getTemp()));
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to move incoming order replacement to native shelf");
                     }
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to add overflow candidate to overflow shelf");
                 }
+            } else {
+                throw new OverflowStrategy.InvalidProcedureException(
+                        "failed to remove overflow candidate from native shelf");
             }
         }
     }
@@ -252,6 +264,9 @@ public class BasicKitchen implements Kitchen {
                 // incoming order takes the removed order's place
                 if(removedFromShelf.addOrder(incomingOrder)) {
                     orderAddedToShelf(date, incomingOrder, removedFromShelf);
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to remove incoming error from native shelf");
                 }
             } else {
                 // replacement must be from overflow shelf, so remove it from the overflow shelf and move it to the
@@ -259,10 +274,19 @@ public class BasicKitchen implements Kitchen {
                 if (getOverflowShelf().removeOrder(replacementOrder)) {
                     if (removedFromShelf.addOrder(replacementOrder)) {
                         orderAddedToShelf(date, replacementOrder, removedFromShelf);
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to add replacement candidate to new shelf");
                     }
                     if (getOverflowShelf().addOrder(incomingOrder)) {
                         orderAddedToShelf(date, incomingOrder, getOverflowShelf());
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to add incoming order from overflow shelf");
                     }
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to remove replacement candidate from overflow shelf");
                 }
             }
         } else if (getOverflowShelf().removeOrder(wasteOrder)) {
@@ -273,6 +297,9 @@ public class BasicKitchen implements Kitchen {
                 // incoming order takes removed overflow order's place
                 if(getOverflowShelf().addOrder(incomingOrder)) {
                     orderAddedToShelf(date, incomingOrder, getOverflowShelf());
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to add incoming order to overflow shelf");
                 }
             } else {
                 // remove replacement order from its shelf and move to overflow shelf, and then move incoming order
@@ -281,10 +308,19 @@ public class BasicKitchen implements Kitchen {
                 if (tempShelf.removeOrder(replacementOrder)) {
                     if (getOverflowShelf().addOrder(replacementOrder)) {
                         orderAddedToShelf(date, replacementOrder, getOverflowShelf());
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to add replacement candidate to overflow shelf");
                     }
                     if (tempShelf.addOrder(incomingOrder)) {
                         orderAddedToShelf(date, incomingOrder, tempShelf);
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to add incoming order to native shelf");
                     }
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to remove replacement candidate from native shelf");
                 }
             }
         } else {
@@ -408,9 +444,18 @@ public class BasicKitchen implements Kitchen {
         if (shelf != getOverflowShelf()) {
             // Replace the open spot with the order selected by the overflow strategy
             Order overflowOrder = overflowStrategy.onOrderRemoved(this, removedOrder, date);
-            if (overflowOrder != null && getOverflowShelf().removeOrder(overflowOrder)) {
-                if (shelf.addOrder(overflowOrder)) {
-                    orderAddedToShelf(date, overflowOrder, shelf);
+            if (overflowOrder != null) {
+                if (getOverflowShelf().removeOrder(overflowOrder)) {
+
+                    if (shelf.addOrder(overflowOrder)) {
+                        orderAddedToShelf(date, overflowOrder, shelf);
+                    } else {
+                        throw new OverflowStrategy.InvalidProcedureException(
+                                "failed to add overflow order to new shelf");
+                    }
+                } else {
+                    throw new OverflowStrategy.InvalidProcedureException(
+                            "failed to remove order from overflow shelf");
                 }
             }
         }

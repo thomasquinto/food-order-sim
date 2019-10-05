@@ -10,6 +10,12 @@ import java.util.Date;
  */
 public interface OverflowStrategy {
 
+    class InvalidProcedureException extends RuntimeException {
+        public InvalidProcedureException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
+
     /**
      * Invoked by a kitchen object when an order is received and its designated temperature shelf is full, such that
      * either the incoming order or an order on the shelf of the designated temperature (of the incoming order) needs

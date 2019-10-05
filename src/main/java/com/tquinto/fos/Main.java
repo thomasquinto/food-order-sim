@@ -33,7 +33,7 @@ public class Main {
             "frozen shelf decay rate multiplier (float)",
             "overflow shelf order capacity (integer)",
             "overflow shelf decay rate multiplier (float)",
-            "verbose mode for display out (boolean)"
+            "verbose mode for output (boolean)"
     };
 
     /**
