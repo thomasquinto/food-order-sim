@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for BasicOverflowStrategy.
+ */
 public class BasicOverflowStrategyTest {
 
     private Order initOrder(BasicOrder order, Date date) {
@@ -21,6 +24,9 @@ public class BasicOverflowStrategyTest {
         return order;
     }
 
+    /**
+     * Builds a kitchen with orders on its shelves for testing.
+     */
     private Kitchen buildKitchen(OverflowStrategy overflowStrategy, Date date) {
         Shelf hotShelf = new BasicShelf("hot", 2, 1.0f);
         Shelf coldShelf = new BasicShelf("cold", 2, 1.0f);
@@ -58,6 +64,9 @@ public class BasicOverflowStrategyTest {
         return kitchen;
     }
 
+    /**
+     * Tests removal of incoming order if it has the shortest decay duration.
+     */
     @Test
     public void testRemoveIncomingOrder() {
         OverflowStrategy overflowStrategy = new BasicOverflowStrategy();
@@ -65,20 +74,61 @@ public class BasicOverflowStrategyTest {
         Kitchen kitchen = buildKitchen(overflowStrategy, date);
 
         Order incomingOrder = initOrder(
-                new BasicOrder("Banana Split", "frozen", 20, .43f), date);
+                new BasicOrder("Banana Split", "frozen", 1, 10.0f), date);
         Pair<Order,Order> orderPair = overflowStrategy.onOverflowShelfFull(kitchen, incomingOrder, date);
 
+        // should return this order as the "removal candidate" because of high decay parameters
         assertEquals(incomingOrder, orderPair.getValue0());
         assertNull(orderPair.getValue1());
     }
 
+    /**
+     * Tests removal of overflow order if it has the shortest decay duration.
+     */
     @Test
     public void testRemoveOverflowOrder() {
+        OverflowStrategy overflowStrategy = new BasicOverflowStrategy();
+        Date date = new Date();
+        Kitchen kitchen = buildKitchen(overflowStrategy, date);
 
+        Order overflowOrder = null;
+        for (Order order : kitchen.getOverflowShelf().getOrders()) {
+            if (order.getName().equals("Apples")) {
+                // set intentionally high decay parameters so strategy will select this as a "removal candidate"
+                ((BasicOrder) order).setShelfLife(1);
+                order.updateDecayRate(new Date(), 10.0f);
+                overflowOrder = order;
+            }
+        }
+        Pair<Order,Order> orderPair = overflowStrategy.onOverflowShelfFull(kitchen, overflowOrder, date);
+
+        // should return this order as the "removal candidate"
+        assertEquals(overflowOrder, orderPair.getValue0());
+        assertNull(orderPair.getValue1());
     }
 
+    /**
+     * Tests removal of an order on a normal (temperature) shelf if it has the shortest decay duration.
+     */
     @Test
     public void testRemoveTempOrder() {
+        OverflowStrategy overflowStrategy = new BasicOverflowStrategy();
+        Date date = new Date();
+        Kitchen kitchen = buildKitchen(overflowStrategy, date);
 
+        Order tempOrder = null;
+        for (Order order : kitchen.getShelf("cold").getOrders()) {
+            if (order.getName().equals("Kombucha")) {
+                // set intentionally high decay parameters so strategy will select this as a "removal candidate"
+                ((BasicOrder) order).setShelfLife(1);
+                order.updateDecayRate(new Date(), 10.0f);
+                tempOrder = order;
+            }
+        }
+        Pair<Order,Order> orderPair = overflowStrategy.onOverflowShelfFull(kitchen, tempOrder, date);
+
+        // should return this order as the "removal candidate"
+        assertEquals(tempOrder, orderPair.getValue0());
+        assertNull(orderPair.getValue1());
     }
 }

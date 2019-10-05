@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for BasicKitchen.
+ */
 public class BasicKitchenTest {
 
     private Kitchen buildKitchen(int shelfCapacity, boolean dispatchDriverImmediately) {
@@ -35,6 +38,7 @@ public class BasicKitchenTest {
                 overflowShelf);
     }
 
+    // generates test order
     public Order getTestOrder() {
         final BasicOrder order = new BasicOrder();
         order.setName("Banana Split");
@@ -45,6 +49,9 @@ public class BasicKitchenTest {
         return order;
     }
 
+    /**
+     * Tests processing an order that ends up getting added to a shelf.
+     */
     @Test
     public void testAddOrderToShelf() {
         final Kitchen kitchen = buildKitchen(1, false);

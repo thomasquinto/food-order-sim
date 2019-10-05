@@ -234,11 +234,11 @@ public class BasicOrderEventDisplay implements OrderEventDisplay {
          * @return formatted string of a list of shelves
          */
         private String formatShelves(List<Shelf> shelves, Date date, boolean isVerboseMode) {
-            String string = "";
+            StringBuffer buffer = new StringBuffer();
             for (Shelf shelf : shelves) {
-                string += String.format("\n%s", formatShelf(shelf, date, isVerboseMode));
+                buffer.append(String.format("\n%s", formatShelf(shelf, date, isVerboseMode)));
             }
-            return string;
+            return buffer.toString();
         }
 
         /**

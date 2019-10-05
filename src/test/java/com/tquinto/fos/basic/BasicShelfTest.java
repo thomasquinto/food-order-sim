@@ -1,13 +1,33 @@
 package com.tquinto.fos.basic;
 
-import com.tquinto.fos.Order;
 import com.tquinto.fos.Shelf;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for BasicShelf.
+ */
 public class BasicShelfTest {
 
+
+    /**
+     * Tests exception being thrown for trying to add order of wrong type/temp.
+     */
+    @Test
+    public void testAddInvalidOrderType() {
+        Shelf shelf  = new BasicShelf("hot", 1, 1.0f);
+        BasicOrder order1 = new BasicOrder();
+        order1.setTemp("cold"); // wrong type
+
+        assertThrows(Shelf.InvalidOrderTypeException.class, () -> {
+            shelf.addOrder(order1);
+        });
+    }
+
+    /**
+     * Tests successful addition of order to a shelf.
+     */
     @Test
     public void testAddOrder() {
         Shelf shelf  = new BasicShelf("hot", 1, 1.0f);
@@ -29,6 +49,10 @@ public class BasicShelfTest {
         assertFalse(shelf.containsOrder(order2));
     }
 
+
+    /**
+     * Tests successful removal of an order from a shelf.
+     */
     @Test
     public void testRemoveOrder() {
         Shelf shelf  = new BasicShelf("hot", 1, 1.0f);
@@ -41,6 +65,9 @@ public class BasicShelfTest {
         assertFalse(shelf.isFull());
     }
 
+    /**
+     * Tests clone of shelf object.
+     */
     @Test
     public void testClone() {
         Shelf shelf = new BasicShelf("hot", 2, 1.0f);
